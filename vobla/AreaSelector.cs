@@ -9,17 +9,6 @@ namespace vobla
 
     class AreaSelector: Form
     {
-        #region WinApiConstants
-        private const int WM_HOTKEY = 0x0312;
-        private const int HOTKEY_ID = 9000;
-        private const int VK_ESCAPE = 0x1B;
-        private const int WM_SETCURSOR = 0x0020;
-        private const int IDC_CROSS = 32515;
-        private const int WS_EX_TRANSPARENT = 0x20;
-        private const int WS_EX_LAYERED = 0x80000;
-        private const int WS_EX_TOOLWINDOW = 0x80;
-        #endregion
-
         private System.Drawing.Point SelectionStart;
         private System.Drawing.Point SelectionEnd;
         private Rectangle area;
@@ -44,7 +33,7 @@ namespace vobla
             MouseMove += new MouseEventHandler(this.MouseMoveEvent);
             MouseUp += new MouseEventHandler(this.MouseUpEvent);
 
-            HotkeyManager.AddGlobalKeyHook(this, 0x0000, VK_ESCAPE);
+            HotkeyManager.AddGlobalKeyHook(this, 0x0000, WinApiConstants.VK_ESCAPE);
         }
 
         void PaintSelection(object sender, PaintEventArgs e)
@@ -110,7 +99,7 @@ namespace vobla
             get
             {
                 var Params = base.CreateParams;
-                Params.ExStyle |= (WS_EX_LAYERED | WS_EX_TOOLWINDOW);
+                Params.ExStyle |= (WinApiConstants.WS_EX_LAYERED | WinApiConstants.WS_EX_TOOLWINDOW);
                 return Params;
             }
         }
@@ -124,12 +113,12 @@ namespace vobla
         protected override void WndProc(ref Message m)
         {
             var handled = false;
-            if (m.Msg == WM_SETCURSOR)
+            if (m.Msg == WinApiConstants.WM_SETCURSOR)
             {
-                SetCursor(LoadCursor(IntPtr.Zero, IDC_CROSS));
+                SetCursor(LoadCursor(IntPtr.Zero, WinApiConstants.IDC_CROSS));
                 handled = true;
             }
-            else if (m.Msg == WM_HOTKEY)
+            else if (m.Msg == WinApiConstants.WM_HOTKEY)
             {
                 this.CancelSelection();
             }

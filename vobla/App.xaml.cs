@@ -83,11 +83,10 @@ namespace vobla
         {
             HotkeyManager.hotKeyPressedEvent += HotKeyHelper_HotKeyPressed;
 
-            const uint VK_4 = 0x34;
-            const uint MOD_CTRL = 0x0002;
-            const uint MOD_SHIFT = 0x0004;
-
-            this.AddKeyHook(VK_4, MOD_CTRL | MOD_SHIFT);
+            this.AddKeyHook(
+                WinApiConstants.VK_4, 
+                WinApiConstants.MOD_CTRL | WinApiConstants.MOD_SHIFT
+            );
         }
 
         private void AddKeyHook(uint vkCode, uint modKeys)
