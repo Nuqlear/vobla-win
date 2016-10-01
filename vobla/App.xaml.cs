@@ -10,6 +10,7 @@ namespace vobla
     {
         private System.Windows.Forms.NotifyIcon notifyIcon = null;
         private Window settingsWindow = null;
+        private Window subWindow = null;
         private AreaSelector asForm = null;
 
         #region Init
@@ -17,6 +18,7 @@ namespace vobla
         {
             this.AddNotifyIcon();
             this.ShowSettingsWindow();
+            this.SetupSubWindow();
             this.AddKeyHook();
 
             this.Exit += App_Exit;
@@ -30,6 +32,19 @@ namespace vobla
                 this.settingsWindow.Closed += SettingsWindow_Closed;
                 this.settingsWindow.Show();
             }
+        }
+
+        private void SetupSubWindow()
+        {
+            this.subWindow = new Window()
+            {
+                Width = 0,
+                Height = 0,
+                WindowStyle = WindowStyle.None,
+                ShowInTaskbar = false,
+                ShowActivated = false
+            };
+            this.subWindow.Show();
         }
 
         #region NotifyIcon
@@ -68,20 +83,21 @@ namespace vobla
         {
             HotkeyManager.hotKeyPressedEvent += HotKeyHelper_HotKeyPressed;
 
-            const uint VK_F5 = 0x74;
+            const uint VK_4 = 0x34;
             const uint MOD_CTRL = 0x0002;
+            const uint MOD_SHIFT = 0x0004;
 
-            this.AddKeyHook(VK_F5, MOD_CTRL);
+            this.AddKeyHook(VK_4, MOD_CTRL | MOD_SHIFT);
         }
 
         private void AddKeyHook(uint vkCode, uint modKeys)
         {
-            HotkeyManager.AddGlobalKeyHook(this.settingsWindow, modKeys, vkCode);
+            HotkeyManager.AddGlobalKeyHook(this.subWindow, modKeys, vkCode);
         }
 
         private void RemoveKeyHook()
         {
-            HotkeyManager.RemoveGlobalKeyHook(this.settingsWindow);
+            HotkeyManager.RemoveGlobalKeyHook(this.subWindow);
         }
 
         private void HotKeyHelper_HotKeyPressed(object sender, EventArgs e)
@@ -119,7 +135,7 @@ namespace vobla
             if (fileRelUrl != null)
             {
                 String host = vobla.Properties.Settings.Default.URL;
-                String url = Path.Combine(host, fileRelUrl);
+                String url = new Uri(new Uri(host), fileRelUrl).ToString();
                 Clipboard.SetDataObject(url);
                 this.notifyIcon.ShowBalloonTip(
                     vobla.Properties.Settings.Default.BalloontipTimeout,

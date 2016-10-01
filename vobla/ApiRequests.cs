@@ -66,11 +66,11 @@ namespace vobla
         private byte[] ImageToByteArray(System.Drawing.Image imageIn)
         {
             MemoryStream ms = new MemoryStream();
-            imageIn.Save(ms, System.Drawing.Imaging.ImageFormat.Gif);
+            imageIn.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
             return ms.ToArray();
         }
 
-        public async Task<String> ImagePost(Image img, string imageName = "screenshot name")
+        public async Task<String> ImagePost(Image img, string imageName = "screenshotname.png")
         {
             var formData = new MultipartFormDataContent();
             HttpContent bytesContent = new ByteArrayContent(this.ImageToByteArray(img));

@@ -10,6 +10,9 @@ namespace vobla
     class AreaSelector: Form
     {
         #region WinApiConstants
+        private const int WM_HOTKEY = 0x0312;
+        private const int HOTKEY_ID = 9000;
+        private const int VK_ESCAPE = 0x1B;
         private const int WM_SETCURSOR = 0x0020;
         private const int IDC_CROSS = 32515;
         private const int WS_EX_TRANSPARENT = 0x20;
@@ -40,7 +43,8 @@ namespace vobla
             MouseDown += new MouseEventHandler(this.MouseDownEvent);
             MouseMove += new MouseEventHandler(this.MouseMoveEvent);
             MouseUp += new MouseEventHandler(this.MouseUpEvent);
-            KeyDown += new KeyEventHandler(this.KeyEvent);
+
+            HotkeyManager.AddGlobalKeyHook(this, 0x0000, VK_ESCAPE);
         }
 
         void PaintSelection(object sender, PaintEventArgs e)
@@ -73,6 +77,7 @@ namespace vobla
         private void EndSelection()
         {
             this.areaSelectedEvent(this.area);
+            HotkeyManager.RemoveGlobalKeyHook(this);
             this.Dispose();
         }
 
@@ -93,14 +98,6 @@ namespace vobla
         private void MouseUpEvent(object sender, MouseEventArgs e)
         {
             this.EndSelection();
-        }
-
-        private void KeyEvent(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Escape)
-            {
-                this.CancelSelection();
-            }
         }
 
         /* 
@@ -131,6 +128,10 @@ namespace vobla
             {
                 SetCursor(LoadCursor(IntPtr.Zero, IDC_CROSS));
                 handled = true;
+            }
+            else if (m.Msg == WM_HOTKEY)
+            {
+                this.CancelSelection();
             }
             if (handled) DefWndProc(ref m); else base.WndProc(ref m);
         }
