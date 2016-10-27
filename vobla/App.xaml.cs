@@ -16,21 +16,27 @@ namespace vobla
         private void DoStartup()
         {
             this.AddNotifyIcon();
-            this.ShowSettingsWindow(null, null);
-            
+            if (UserModel.IsLoggedIn())
+            {
+                ApiRequests.Instance.SetToken(UserModel.Token);
+            }
+            this.InitSettingsWindow();
+            this.updateContextMenu();
             this.AddKeyHook();
             this.Exit += App_Exit;
         }
 
-        private void ShowSettingsWindow(object sender, EventArgs e)
+        private void InitSettingsWindow()
         {
             if (this.settingsWindow == null)
             {
                 this.settingsWindow = new SettingsWindow();
                 this.settingsWindow.Hided += this.SettingsWindow_Hided;
             }
-            this.settingsWindow.Show();
-            this.updateContextMenu();
+            if (!UserModel.IsLoggedIn())
+            {
+                this.settingsWindow.Show();
+            }
         }
 
         #region NotifyIcon
@@ -67,7 +73,13 @@ namespace vobla
                     Text = vobla.Properties.Resources.NotifySettings,
                     Name = vobla.Properties.Resources.NotifySettings
                 };
-                itemSettings.Click += ShowSettingsWindow;
+                itemSettings.Click += (object sender, EventArgs e) => {
+                    if (this.settingsWindow != null)
+                    {
+                        this.settingsWindow.Show();
+                        this.updateContextMenu();
+                    }
+                };
                 contextMenu.MenuItems.Add(itemSettings);
             }
             contextMenu.MenuItems.Add(itemExit);

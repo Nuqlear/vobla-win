@@ -79,6 +79,7 @@
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserModel.cs" />
     <Compile Include="WinApiConstants.cs" />
   </ItemGroup>
   <ItemGroup>

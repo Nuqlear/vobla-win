@@ -50,12 +50,12 @@ namespace vobla.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string Username {
+        public string Email {
             get {
-                return ((string)(this["Username"]));
+                return ((string)(this["Email"]));
             }
             set {
-                this["Username"] = value;
+                this["Email"] = value;
             }
         }
         

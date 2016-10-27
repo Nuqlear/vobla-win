@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.ComponentModel;
+using System.Windows.Interop;
 
 namespace vobla
 {
@@ -52,26 +53,17 @@ namespace vobla
 
         public SettingsWindow()
         {
-            this.email = "";
-            this.logged = false;
-
+            this.email = UserModel.Email;
+            this.logged = UserModel.IsLoggedIn();
             InitializeComponent();
+            InitHwnd();
         }
-        /*
-        private ICommand mLoginCommand;
-        public ICommand LoginCommand
+
+        public void InitHwnd()
         {
-            get
-            {
-                if (mLoginCommand == null)
-                    mLoginCommand = new RelayCommand<Object>(this.Login);
-                return mLoginCommand;
-            }
-            set
-            {
-                mLoginCommand = value;
-            }
-        }*/
+            var helper = new WindowInteropHelper(this);
+            helper.EnsureHandle();
+        }
 
         private ICommand mLoginCommand;
         public ICommand LoginCommand
@@ -94,14 +86,22 @@ namespace vobla
             if (passwordBox == null || passwordBox.Password.Length == 0 || this.email.Length == 0)
                 return;
             var password = passwordBox.Password;
-            await ApiRequests.Instance.LoginPost(this.email, password);
-            this.logged = true;
+            var dict = await ApiRequests.Instance.LoginPost(this.email, password);
+            if (dict.ContainsKey("token"))
+            {
+                var token = dict["token"];
+                ApiRequests.Instance.SetToken(token);
+                UserModel.Token = token;
+                UserModel.Email = this.email;
+                this.logged = UserModel.IsLoggedIn();
+            }
         }
 
         private void logoutB_Click(object sender, RoutedEventArgs e)
         {
-            this.logged = false;
-            this.email = "";
+            UserModel.Clear();
+            this.logged = UserModel.IsLoggedIn();
+            this.email = UserModel.Email;
         }
 
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)

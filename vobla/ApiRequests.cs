@@ -39,28 +39,29 @@ namespace vobla
 
         public void SetToken(string token)
         {
-
             this.httpclient.DefaultRequestHeaders.Remove("Auth-token");
             this.httpclient.DefaultRequestHeaders.Add("Auth-token", token);
         }
 
-        public async Task LoginPost(string email, string password)
+        public async Task<Dictionary<String, String>> LoginPost(string email, string password)
         {
             LoginData data = new LoginData { email = email, password = password };
             var response = await this.httpclient.PostAsJsonAsync("user/login", data);
             var result = await response.Content.ReadAsStringAsync();
+            var dict = new Dictionary<String, String>();
             if (response.IsSuccessStatusCode)
             {
                 JObject jData = JObject.Parse(result);
-                string token = (string)jData["token"];
-                vobla.Properties.Settings.Default.Token = token;
-                this.SetToken(token);
-                Console.WriteLine(vobla.Properties.Settings.Default.Token);
+                foreach(var node in jData)
+                {
+                    dict[node.Key] = (string)node.Value;
+                }
             }
             else
             {
                 Console.WriteLine("{0} ({1})", (int)response.StatusCode, result);
             }
+            return dict;
         }
 
         private byte[] ImageToByteArray(System.Drawing.Image imageIn)
