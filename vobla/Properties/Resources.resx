@@ -131,7 +131,7 @@
     <value>genkstacloud</value>
   </data>
   <data name="SettingsWindowTitle" xml:space="preserve">
-    <value>oblaco settings</value>
+    <value>vobla settings</value>
   </data>
   <data name="AccountLoginEmailLabel" xml:space="preserve">
     <value>Email address</value>
@@ -150,5 +150,14 @@
   </data>
   <data name="BalloontipUploadErrorTitle" xml:space="preserve">
     <value>Upload error</value>
+  </data>
+  <data name="NotifySettings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="AccountLoggedAs" xml:space="preserve">
+    <value>You are logged in as:</value>
+  </data>
+  <data name="AccountLogoutButton" xml:space="preserve">
+    <value>Logout</value>
   </data>
 </root>

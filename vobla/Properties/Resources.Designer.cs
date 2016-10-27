@@ -61,6 +61,15 @@ namespace vobla.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на You are logged in as:.
+        /// </summary>
+        public static string AccountLoggedAs {
+            get {
+                return ResourceManager.GetString("AccountLoggedAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Login.
         /// </summary>
         public static string AccountLoginButton {
@@ -84,6 +93,15 @@ namespace vobla.Properties {
         public static string AccountLoginPWLabel {
             get {
                 return ResourceManager.GetString("AccountLoginPWLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Logout.
+        /// </summary>
+        public static string AccountLogoutButton {
+            get {
+                return ResourceManager.GetString("AccountLogoutButton", resourceCulture);
             }
         }
         
@@ -143,6 +161,15 @@ namespace vobla.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Settings.
+        /// </summary>
+        public static string NotifySettings {
+            get {
+                return ResourceManager.GetString("NotifySettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на genkstacloud.
         /// </summary>
         public static string NotifyText {
@@ -152,7 +179,7 @@ namespace vobla.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на oblaco settings.
+        ///   Ищет локализованную строку, похожую на vobla settings.
         /// </summary>
         public static string SettingsWindowTitle {
             get {

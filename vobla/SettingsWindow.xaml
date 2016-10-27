@@ -8,30 +8,82 @@
         mc:Ignorable="d"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        Title="{x:Static p:Resources.SettingsWindowTitle}" Height="250" Width="420">
+        Closing="WindowClosing"
+        Title="{x:Static p:Resources.SettingsWindowTitle}" Height="250" Width="420"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}">
+
+    <Window.Resources>
+        <DataTemplate x:Key="LogoutDataTemplate">
+            <StackPanel Margin="0,5,0,-5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Content="{x:Static p:Resources.AccountLoggedAs}"></Label>
+                    <Label Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" 
+                           Content="{Binding email, Mode = TwoWay, UpdateSourceTrigger = PropertyChanged, 
+                        RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"></Label>
+                </Grid>
+                <Button Content="{x:Static p:Resources.AccountLogoutButton}" Height="26" VerticalAlignment="Top" 
+                        RenderTransformOrigin="0.49,1.269" Margin="0,5,130,5" HorizontalAlignment="Right" Width="84"
+                        Click="logoutB_Click"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="LoginDataTemplate">
+            <StackPanel Margin="0,5,0,-5">
+                <Grid>
+
+                    <!-- Устанавливаем две строки -->
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <!-- Устанавливаем три столбца -->
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <!-- Размещаем элементы в сетке -->
+                    <Label Grid.Row="0" Grid.Column="0" Content="{x:Static p:Resources.AccountLoginEmailLabel}"></Label>
+                    <Label Grid.Row="1" Grid.Column="0" Content="{x:Static p:Resources.AccountLoginPWLabel}"></Label>
+                    <TextBox Height="30" Padding="5" Grid.Row="0" Grid.Column="1" Margin="2,2,10,2"
+                        Text = "{Binding email, Mode = TwoWay, UpdateSourceTrigger = PropertyChanged, 
+                        RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"/>
+                    <PasswordBox Name="passwordBox" Height="30" Padding="5" Grid.Row="1" Grid.Column="1" Margin="2,2,10,2"/>
+                </Grid>
+                <Button Content="{x:Static p:Resources.AccountLoginButton}" Height="26" 
+                        VerticalAlignment="Top" RenderTransformOrigin="0.49,1.269" Margin="0,5,130,5" 
+                        HorizontalAlignment="Right" Width="84"
+                        Command="{Binding Path=LoginCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                        CommandParameter="{Binding ElementName=passwordBox}"/>
+            </StackPanel>
+        </DataTemplate>
+
+    </Window.Resources>
+
+
+
     <TabControl Margin="10">
         <TabItem Header="Account">
             <GroupBox Header="Account Setup" Margin="5" Padding="5">
                 <StackPanel Margin="0,5,0,-5">
-                    <Grid>
-
-                        <!-- Устанавливаем две строки -->
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <!-- Устанавливаем три столбца -->
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <!-- Размещаем элементы в сетке -->
-                        <Label Grid.Row="0" Grid.Column="0" Content="{x:Static p:Resources.AccountLoginEmailLabel}"></Label>
-                        <Label Grid.Row="1" Grid.Column="0" Content="{x:Static p:Resources.AccountLoginPWLabel}"></Label>
-                        <TextBox Height="30" Padding="5" Grid.Row="0" Grid.Column="1" x:Name="emailTB" Margin="2,2,10,2"/>
-                        <PasswordBox Height="30" Padding="5" Grid.Row="1" Grid.Column="1" x:Name="passwordPB" Margin="2,2,10,2"/>
-                    </Grid>
-                    <Button Content="{x:Static p:Resources.AccountLoginButton}" Height="26" x:Name="loginB" VerticalAlignment="Top" RenderTransformOrigin="0.49,1.269" Margin="0,5,130,5" HorizontalAlignment="Right" Width="84" Click="loginB_Click"/>
+                    <ContentControl>
+                        <ContentControl.Style>
+                            <Style TargetType="{x:Type ContentControl}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource LoginDataTemplate}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding logged, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="True" >
+                                        <Setter Property="ContentTemplate" Value="{StaticResource LogoutDataTemplate}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ContentControl.Style>
+                    </ContentControl>
                 </StackPanel>
             </GroupBox>
         </TabItem>
@@ -43,4 +95,5 @@
             </TabItem.Header>
         </TabItem>
     </TabControl>
+    
 </Window>

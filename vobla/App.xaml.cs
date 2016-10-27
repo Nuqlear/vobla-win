@@ -9,42 +9,28 @@ namespace vobla
     public partial class App : Application, IDisposable
     {
         private System.Windows.Forms.NotifyIcon notifyIcon = null;
-        private Window settingsWindow = null;
-        private Window subWindow = null;
+        private SettingsWindow settingsWindow = null;
         private AreaSelector asForm = null;
 
         #region Init
         private void DoStartup()
         {
             this.AddNotifyIcon();
-            this.ShowSettingsWindow();
-            this.SetupSubWindow();
+            this.ShowSettingsWindow(null, null);
+            
             this.AddKeyHook();
-
             this.Exit += App_Exit;
         }
 
-        private void ShowSettingsWindow()
+        private void ShowSettingsWindow(object sender, EventArgs e)
         {
             if (this.settingsWindow == null)
             {
                 this.settingsWindow = new SettingsWindow();
-                this.settingsWindow.Closed += SettingsWindow_Closed;
-                this.settingsWindow.Show();
+                this.settingsWindow.Hided += this.SettingsWindow_Hided;
             }
-        }
-
-        private void SetupSubWindow()
-        {
-            this.subWindow = new Window()
-            {
-                Width = 0,
-                Height = 0,
-                WindowStyle = WindowStyle.None,
-                ShowInTaskbar = false,
-                ShowActivated = false
-            };
-            this.subWindow.Show();
+            this.settingsWindow.Show();
+            this.updateContextMenu();
         }
 
         #region NotifyIcon
@@ -55,11 +41,13 @@ namespace vobla
             this.notifyIcon.Text = vobla.Properties.Resources.NotifyText;
             this.notifyIcon.Icon = vobla.Properties.Resources.favicon;
 
-            // setup icon's actions
-            this.notifyIcon.ContextMenu = this.CreateNotifyIconContextMenu();
-
             // show icon
             this.notifyIcon.Visible = true;
+        }
+
+        private void updateContextMenu()
+        {
+            this.notifyIcon.ContextMenu = this.CreateNotifyIconContextMenu();
         }
 
         private System.Windows.Forms.ContextMenu CreateNotifyIconContextMenu()
@@ -67,10 +55,21 @@ namespace vobla
             System.Windows.Forms.ContextMenu contextMenu = new System.Windows.Forms.ContextMenu();
             System.Windows.Forms.MenuItem itemExit = new System.Windows.Forms.MenuItem()
             {
-                Text = vobla.Properties.Resources.NotifyExit
+                Text = vobla.Properties.Resources.NotifyExit,
+                Name = vobla.Properties.Resources.NotifyExit
             };
             itemExit.Click += TrayExit_Click;
-
+            if (!this.settingsWindow.IsVisible)
+            {
+                System.Windows.Forms.MenuItem itemSettings = new System.Windows.Forms.MenuItem()
+                {
+                    Index = 0,
+                    Text = vobla.Properties.Resources.NotifySettings,
+                    Name = vobla.Properties.Resources.NotifySettings
+                };
+                itemSettings.Click += ShowSettingsWindow;
+                contextMenu.MenuItems.Add(itemSettings);
+            }
             contextMenu.MenuItems.Add(itemExit);
             return contextMenu;
         }
@@ -91,12 +90,12 @@ namespace vobla
 
         private void AddKeyHook(uint vkCode, uint modKeys)
         {
-            HotkeyManager.AddGlobalKeyHook(this.subWindow, modKeys, vkCode);
+            HotkeyManager.AddGlobalKeyHook(this.settingsWindow, modKeys, vkCode);
         }
 
         private void RemoveKeyHook()
         {
-            HotkeyManager.RemoveGlobalKeyHook(this.subWindow);
+            HotkeyManager.RemoveGlobalKeyHook(this.settingsWindow);
         }
 
         private void HotKeyHelper_HotKeyPressed(object sender, EventArgs e)
@@ -104,7 +103,6 @@ namespace vobla
             this.ScreenshotArea();
         }
         #endregion
-
 
         #region Screenshots
         private void ScreenshotArea()
@@ -159,17 +157,17 @@ namespace vobla
         #region Events
         private void TrayExit_Click(object sender, EventArgs e)
         {
+            this.RemoveKeyHook();
             this.Shutdown();
         }
 
-        private void SettingsWindow_Closed(object sender, EventArgs e)
+        private void SettingsWindow_Hided(object sender, EventArgs e)
         {
-            this.settingsWindow = null;
+            this.updateContextMenu();
         }
 
         private void App_Exit(object sender, ExitEventArgs e)
         {
-            this.RemoveKeyHook();
             this.notifyIcon.Dispose();
         }
 

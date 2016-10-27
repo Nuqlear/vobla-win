@@ -44,7 +44,7 @@ namespace vobla
             this.httpclient.DefaultRequestHeaders.Add("Auth-token", token);
         }
 
-        public async void LoginPost(string email, string password)
+        public async Task LoginPost(string email, string password)
         {
             LoginData data = new LoginData { email = email, password = password };
             var response = await this.httpclient.PostAsJsonAsync("user/login", data);

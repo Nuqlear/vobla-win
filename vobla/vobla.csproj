@@ -75,6 +75,7 @@
     </Compile>
     <Compile Include="HotkeyManager.cs" />
     <Compile Include="CaptureScreen.cs" />
+    <Compile Include="AsyncRelayCommand.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
