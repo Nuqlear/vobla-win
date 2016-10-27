@@ -39,6 +39,12 @@ namespace vobla
             }
         }
 
+        public void ShowSettingsWindow()
+        {
+            this.settingsWindow.Show();
+            this.updateContextMenu();
+        }
+
         #region NotifyIcon
         private void AddNotifyIcon()
         {
@@ -46,7 +52,10 @@ namespace vobla
             this.notifyIcon = new System.Windows.Forms.NotifyIcon();
             this.notifyIcon.Text = vobla.Properties.Resources.NotifyText;
             this.notifyIcon.Icon = vobla.Properties.Resources.favicon;
-
+            
+            this.notifyIcon.MouseDoubleClick += (object sender, System.Windows.Forms.MouseEventArgs e) => {
+                ShowSettingsWindow();
+            };
             // show icon
             this.notifyIcon.Visible = true;
         }
@@ -61,24 +70,29 @@ namespace vobla
             System.Windows.Forms.ContextMenu contextMenu = new System.Windows.Forms.ContextMenu();
             System.Windows.Forms.MenuItem itemExit = new System.Windows.Forms.MenuItem()
             {
-                Text = vobla.Properties.Resources.NotifyExit,
-                Name = vobla.Properties.Resources.NotifyExit
+                Text = vobla.Properties.Resources.NotifyExit
             };
             itemExit.Click += TrayExit_Click;
+            string appName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString();
+            string version = System.Reflection.Assembly.GetExecutingAssembly()
+                .GetName().Version.ToString();
+            System.Windows.Forms.MenuItem voblaInfo = new System.Windows.Forms.MenuItem()
+            {
+                Checked = true,
+                Index = 0,
+                Enabled = false,
+                Text = appName + " " + version
+            };
+            contextMenu.MenuItems.Add(voblaInfo);
             if (!this.settingsWindow.IsVisible)
             {
                 System.Windows.Forms.MenuItem itemSettings = new System.Windows.Forms.MenuItem()
                 {
-                    Index = 0,
-                    Text = vobla.Properties.Resources.NotifySettings,
-                    Name = vobla.Properties.Resources.NotifySettings
+                    Index = 1,
+                    Text = vobla.Properties.Resources.NotifySettings
                 };
                 itemSettings.Click += (object sender, EventArgs e) => {
-                    if (this.settingsWindow != null)
-                    {
-                        this.settingsWindow.Show();
-                        this.updateContextMenu();
-                    }
+                    ShowSettingsWindow();
                 };
                 contextMenu.MenuItems.Add(itemSettings);
             }
@@ -119,7 +133,7 @@ namespace vobla
         #region Screenshots
         private void ScreenshotArea()
         {
-            if (this.asForm == null)
+            if (this.asForm == null && UserModel.IsLoggedIn())
             {
                 this.asForm = new AreaSelector();
                 this.asForm.Show();

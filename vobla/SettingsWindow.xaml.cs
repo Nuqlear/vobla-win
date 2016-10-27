@@ -56,6 +56,7 @@ namespace vobla
             this.email = UserModel.Email;
             this.logged = UserModel.IsLoggedIn();
             InitializeComponent();
+            // force init window's HWND
             InitHwnd();
         }
 
