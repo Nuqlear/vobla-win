@@ -14,5 +14,17 @@
     <Setting Name="BalloontipTimeout" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">3500</Value>
     </Setting>
+    <Setting Name="CaptureAreaVKCode" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">52</Value>
+    </Setting>
+    <Setting Name="CaptureAreaVKModifier" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">6</Value>
+    </Setting>
+    <Setting Name="CaptureScreenVKCode" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">51</Value>
+    </Setting>
+    <Setting Name="CaptureScreenVKModifier" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">6</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

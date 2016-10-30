@@ -42,6 +42,26 @@ namespace vobla
                 OnPropertyChanged("email");
             }
         }
+        private string _captureAreaHotkey;
+        public string captureAreaHotkey
+        {
+            get { return _captureAreaHotkey; }
+            set
+            {
+                _captureAreaHotkey = value;
+                OnPropertyChanged("captureAreaHotkey");
+            }
+        }
+        private string _captureScreenHotkey;
+        public string captureScreenHotkey
+        {
+            get { return _captureScreenHotkey; }
+            set
+            {
+                _captureScreenHotkey = value;
+                OnPropertyChanged("captureScreenHotkey");
+            }
+        }
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnPropertyChanged(string propertyName)
@@ -55,9 +75,22 @@ namespace vobla
         {
             this.email = UserModel.Email;
             this.logged = UserModel.IsLoggedIn();
+            this.ConvertKeyCodes();
             InitializeComponent();
             // force init window's HWND
             InitHwnd();
+        }
+
+        public void ConvertKeyCodes()
+        {
+            var keysConverter = new System.Windows.Forms.KeysConverter();
+            var areaKey = (System.Windows.Forms.Keys)vobla.Properties.Settings.Default.CaptureAreaVKCode;
+            var areaModifierKeys = (System.Windows.Input.ModifierKeys)vobla.Properties.Settings.Default.CaptureAreaVKModifier;
+            this.captureAreaHotkey = areaModifierKeys.ToString() + " + " + keysConverter.ConvertToString(areaKey);
+
+            var screenKey = (System.Windows.Forms.Keys)vobla.Properties.Settings.Default.CaptureScreenVKCode;
+            var screeModifierKeys = (System.Windows.Input.ModifierKeys)vobla.Properties.Settings.Default.CaptureScreenVKModifier;
+            this.captureScreenHotkey = screeModifierKeys.ToString() + " + " + keysConverter.ConvertToString(screenKey);
         }
 
         public void InitHwnd()

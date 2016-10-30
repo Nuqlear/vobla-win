@@ -43,6 +43,21 @@ namespace vobla
             this.httpclient.DefaultRequestHeaders.Add("Auth-token", token);
         }
 
+        public async Task<bool> SyncPost()
+        {
+            var response = await this.httpclient.PostAsync("user/sync", null);
+            var result = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("{0} ({1})", (int)response.StatusCode, result);
+                return false;
+            }
+        }
+
         public async Task<Dictionary<String, String>> LoginPost(string email, string password)
         {
             LoginData data = new LoginData { email = email, password = password };
@@ -76,12 +91,12 @@ namespace vobla
             var formData = new MultipartFormDataContent();
             HttpContent bytesContent = new ByteArrayContent(this.ImageToByteArray(img));
             formData.Add(bytesContent, "file", imageName);
-            var response = await this.httpclient.PostAsync("files/upload", formData);
+            var response = await this.httpclient.PostAsync("files", formData);
             var result = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {
                 JObject jData = JObject.Parse(result);
-                string url = (string)(jData["file"]["url"]);
+                string url = (string)(jData["file"]["hash"]);
                 Console.WriteLine(url);
                 return url;
             }

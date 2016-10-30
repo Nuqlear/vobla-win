@@ -170,7 +170,7 @@ namespace vobla.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на genkstacloud.
+        ///   Ищет локализованную строку, похожую на vobla.
         /// </summary>
         public static string NotifyText {
             get {
@@ -179,7 +179,7 @@ namespace vobla.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на vobla settings.
+        ///   Ищет локализованную строку, похожую на vobla.
         /// </summary>
         public static string SettingsWindowTitle {
             get {

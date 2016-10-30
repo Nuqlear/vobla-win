@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace vobla
@@ -19,6 +20,12 @@ namespace vobla
             if (UserModel.IsLoggedIn())
             {
                 ApiRequests.Instance.SetToken(UserModel.Token);
+                // running task synchronously
+                var res = Task.Run(async () => await ApiRequests.Instance.SyncPost()).Result;
+                if (!res)
+                {
+                    UserModel.Clear();
+                }
             }
             this.InitSettingsWindow();
             this.updateContextMenu();
@@ -102,15 +109,18 @@ namespace vobla
         #endregion
         #endregion
 
-
         #region Hotkeys
         private void AddKeyHook()
         {
             HotkeyManager.hotKeyPressedEvent += HotKeyHelper_HotKeyPressed;
+            this.AddKeyHook(
+                vobla.Properties.Settings.Default.CaptureAreaVKCode,
+                vobla.Properties.Settings.Default.CaptureAreaVKModifier
+            );
 
             this.AddKeyHook(
-                WinApiConstants.VK_4, 
-                WinApiConstants.MOD_CTRL | WinApiConstants.MOD_SHIFT
+                vobla.Properties.Settings.Default.CaptureScreenVKCode,
+                vobla.Properties.Settings.Default.CaptureScreenVKModifier
             );
         }
 
@@ -126,11 +136,29 @@ namespace vobla
 
         private void HotKeyHelper_HotKeyPressed(object sender, EventArgs e)
         {
-            this.ScreenshotArea();
+            var keyEvent = (System.Windows.Forms.KeyEventArgs)e;
+            if (keyEvent.KeyValue == vobla.Properties.Settings.Default.CaptureAreaVKCode)
+            {
+                this.ScreenshotArea();
+            }
+            else if (keyEvent.KeyValue == vobla.Properties.Settings.Default.CaptureScreenVKCode)
+            {
+                this.ScreenshotScreen();
+            }
         }
         #endregion
 
         #region Screenshots
+        private async void ScreenshotScreen()
+        {
+            if (UserModel.IsLoggedIn())
+            {
+                Image img = CaptureScreen.CaptureFullscreen();
+                var result = await ApiRequests.Instance.ImagePost(img);
+                FileUploaded(result);
+            }
+        }
+
         private void ScreenshotArea()
         {
             if (this.asForm == null && UserModel.IsLoggedIn())
@@ -153,12 +181,12 @@ namespace vobla
             
         }
 
-        private void FileUploaded(string fileRelUrl)
+        private void FileUploaded(string fileSlug)
         {
-            if (fileRelUrl != null)
+            if (fileSlug != null)
             {
                 String host = vobla.Properties.Settings.Default.URL;
-                String url = new Uri(new Uri(host), fileRelUrl).ToString();
+                String url = new Uri(new Uri(host), fileSlug).ToString();
                 Clipboard.SetDataObject(url);
                 this.notifyIcon.ShowBalloonTip(
                     vobla.Properties.Settings.Default.BalloontipTimeout,

@@ -51,6 +51,14 @@ namespace vobla
             UnregisterHotKey(form.Handle, WinApiConstants.HOTKEY_ID);
         }
 
+        public enum Modifiers
+        {
+            Alt = 0x0001,
+            Control = 0x0002,
+            Shift = 0x0004,
+            LWin = 0x0008
+        }
+
         private static IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             switch (msg)
@@ -59,13 +67,22 @@ namespace vobla
                     switch (wParam.ToInt32())
                     {
                         case WinApiConstants.HOTKEY_ID:
-                            hotKeyPressedEvent(null, new EventArgs());
+                            var lpInt = (int)lParam;
+                            var modifiers = (Modifiers)(lpInt & 0xFFFF);
+                            var key = (Keys)((lpInt >> 16) & 0xFFFF);          
+                            foreach (var modifierKey in Enum.GetValues(typeof(Modifiers)))
+                            {
+                                if (modifiers.HasFlag((Modifiers)modifierKey))
+                                {
+                                    key = key | (Keys)(Enum.Parse(typeof(Keys), Enum.GetName(typeof(Modifiers), modifierKey)));
+                                }
+                            }
+                            hotKeyPressedEvent(null, new KeyEventArgs(key));
                             handled = true;
                             break;
                     }
                     break;
             }
-
             return IntPtr.Zero;
         }
     }

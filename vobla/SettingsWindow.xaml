@@ -92,6 +92,32 @@
                     <TextBlock>Hotkeys</TextBlock>
                 </StackPanel>
             </TabItem.Header>
+            <GroupBox Header="Hotkeys Setup" Margin="5" Padding="5">
+                <StackPanel Margin="0,5,0,-5">
+                    <Grid>
+                        <!-- Устанавливаем две строки -->
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <!-- Устанавливаем три столбца -->
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <!-- Размещаем элементы в сетке -->
+                        <Label Grid.Row="0" Grid.Column="0" 
+                               Content="Capture Screen"></Label>
+                        <Button Height="30" Padding="5" Grid.Row="0" Grid.Column="1" Margin="2,2,10,2"
+                        Content="{Binding captureScreenHotkey, Mode = TwoWay, UpdateSourceTrigger = PropertyChanged}"/>
+
+                        <Label Grid.Row="1" Grid.Column="0" 
+                               Content="Capture Area"></Label>
+                        <Button Height="30" Padding="5" Grid.Row="1" Grid.Column="1" Margin="2,2,10,2"
+                        Content="{Binding captureAreaHotkey, Mode = TwoWay, UpdateSourceTrigger = PropertyChanged}"/>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
         </TabItem>
     </TabControl>
     

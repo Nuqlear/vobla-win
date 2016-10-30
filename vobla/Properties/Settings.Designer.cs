@@ -70,5 +70,53 @@ namespace vobla.Properties {
                 this["BalloontipTimeout"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("52")]
+        public uint CaptureAreaVKCode {
+            get {
+                return ((uint)(this["CaptureAreaVKCode"]));
+            }
+            set {
+                this["CaptureAreaVKCode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        public uint CaptureAreaVKModifier {
+            get {
+                return ((uint)(this["CaptureAreaVKModifier"]));
+            }
+            set {
+                this["CaptureAreaVKModifier"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("51")]
+        public uint CaptureScreenVKCode {
+            get {
+                return ((uint)(this["CaptureScreenVKCode"]));
+            }
+            set {
+                this["CaptureScreenVKCode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        public uint CaptureScreenVKModifier {
+            get {
+                return ((uint)(this["CaptureScreenVKModifier"]));
+            }
+            set {
+                this["CaptureScreenVKModifier"] = value;
+            }
+        }
     }
 }

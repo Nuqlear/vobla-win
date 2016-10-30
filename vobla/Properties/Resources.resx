@@ -128,10 +128,10 @@
     <value>Exit</value>
   </data>
   <data name="NotifyText" xml:space="preserve">
-    <value>genkstacloud</value>
+    <value>vobla</value>
   </data>
   <data name="SettingsWindowTitle" xml:space="preserve">
-    <value>vobla settings</value>
+    <value>vobla</value>
   </data>
   <data name="AccountLoginEmailLabel" xml:space="preserve">
     <value>Email address</value>
