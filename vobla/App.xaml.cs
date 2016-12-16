@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using Squirrel;
 
 namespace vobla
 {
@@ -12,10 +13,13 @@ namespace vobla
         private System.Windows.Forms.NotifyIcon notifyIcon = null;
         private SettingsWindow settingsWindow = null;
         private AreaSelector asForm = null;
+        private UpdateManager updateManager = null;
 
         #region Init
         private void DoStartup()
         {
+            updateManager = new UpdateManager(new Uri(new Uri(vobla.Properties.Settings.Default.URL), "releases/win").ToString());
+            updateManager.CheckForUpdate();
             this.AddNotifyIcon();
             if (UserModel.IsLoggedIn())
             {
@@ -222,6 +226,7 @@ namespace vobla
 
         private void App_Exit(object sender, ExitEventArgs e)
         {
+                        updateManager.Dispose();
             this.notifyIcon.Dispose();
         }
 
