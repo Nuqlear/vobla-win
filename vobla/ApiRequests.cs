@@ -96,7 +96,7 @@ namespace vobla
             if (response.IsSuccessStatusCode)
             {
                 JObject jData = JObject.Parse(result);
-                string url = (string)(jData["file"]["hash"]);
+                string url = (string)(jData["file"]["hash"]) + "*";
                 Console.WriteLine(url);
                 return url;
             }

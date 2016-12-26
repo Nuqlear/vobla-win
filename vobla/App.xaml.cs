@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Squirrel;
@@ -13,14 +15,12 @@ namespace vobla
         private System.Windows.Forms.NotifyIcon notifyIcon = null;
         private SettingsWindow settingsWindow = null;
         private AreaSelector asForm = null;
-        private UpdateManager updateManager = null;
 
         #region Init
         private void DoStartup()
         {
-            updateManager = new UpdateManager(new Uri(new Uri(vobla.Properties.Settings.Default.URL), "releases/win").ToString());
-            updateManager.CheckForUpdate();
             this.AddNotifyIcon();
+            Task.Run(async () => await App.CheckForUpdates());
             if (UserModel.IsLoggedIn())
             {
                 ApiRequests.Instance.SetToken(UserModel.Token);
@@ -35,6 +35,24 @@ namespace vobla
             this.updateContextMenu();
             this.AddKeyHook();
             this.Exit += App_Exit;
+        }
+
+        private static async Task<int> CheckForUpdates()
+        {
+            using (var mgr = new UpdateManager(new Uri(new Uri(vobla.Properties.Settings.Default.URL), "releases/win").ToString()))
+            {
+                var updateInfo = await mgr.CheckForUpdate(progress: x => Console.WriteLine(x / 3));
+                var remoteVersion = new Version(updateInfo.FutureReleaseEntry.Version.ToString());
+                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+                var localVersion = new Version(fvi.FileVersion);
+                if (remoteVersion.CompareTo(localVersion) > 0)
+                {
+                    await mgr.UpdateApp();
+                    UpdateManager.RestartApp();
+                }
+            }
+            return 0;
         }
 
         private void InitSettingsWindow()
@@ -84,15 +102,14 @@ namespace vobla
                 Text = vobla.Properties.Resources.NotifyExit
             };
             itemExit.Click += TrayExit_Click;
-            string appName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString();
-            string version = System.Reflection.Assembly.GetExecutingAssembly()
-                .GetName().Version.ToString();
+            var appName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString();
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             System.Windows.Forms.MenuItem voblaInfo = new System.Windows.Forms.MenuItem()
             {
                 Checked = true,
                 Index = 0,
                 Enabled = false,
-                Text = appName + " " + version
+                Text = $"{appName} {version.Major}.{version.Minor}.{version.Build}"
             };
             contextMenu.MenuItems.Add(voblaInfo);
             if (!this.settingsWindow.IsVisible)
@@ -211,7 +228,6 @@ namespace vobla
         }
         #endregion
 
-
         #region Events
         private void TrayExit_Click(object sender, EventArgs e)
         {
@@ -226,7 +242,6 @@ namespace vobla
 
         private void App_Exit(object sender, ExitEventArgs e)
         {
-                        updateManager.Dispose();
             this.notifyIcon.Dispose();
         }
 
@@ -235,7 +250,6 @@ namespace vobla
             this.DoStartup();
         }
         #endregion
-
 
         #region IDisposable
         public void Dispose()
