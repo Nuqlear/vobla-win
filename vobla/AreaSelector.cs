@@ -9,14 +9,14 @@ namespace vobla
 
     class AreaSelector: Form
     {
-        private System.Drawing.Point SelectionStart;
-        private System.Drawing.Point SelectionEnd;
-        private Rectangle area;
-        public event AreaSelected areaSelectedEvent;
+        private System.Drawing.Point _selectionStart;
+        private System.Drawing.Point _selectionEnd;
+        private Rectangle _area;
+        public event AreaSelected AreaSelectedEvent;
 
         public AreaSelector()
         {
-            this.area = default(Rectangle);
+            this._area = default(Rectangle);
 
             this.DoubleBuffered = true;
 
@@ -38,34 +38,34 @@ namespace vobla
 
         void PaintSelection(object sender, PaintEventArgs e)
         {
-            if (this.SelectionStart.IsEmpty)
+            if (this._selectionStart.IsEmpty)
             {
                 return;
             }
             var pt = Cursor.Position;
             var location = new System.Drawing.Point(
-                Math.Min(this.SelectionStart.X, this.SelectionEnd.X),
-                Math.Min(this.SelectionStart.Y, this.SelectionEnd.Y)
+                Math.Min(this._selectionStart.X, this._selectionEnd.X),
+                Math.Min(this._selectionStart.Y, this._selectionEnd.Y)
             );
-            this.SelectionEnd = pt;
+            this._selectionEnd = pt;
             var destination = new System.Drawing.Point(
-                Math.Max(this.SelectionStart.X, this.SelectionEnd.X),
-                Math.Max(this.SelectionStart.Y, this.SelectionEnd.Y)
+                Math.Max(this._selectionStart.X, this._selectionEnd.X),
+                Math.Max(this._selectionStart.Y, this._selectionEnd.Y)
             );
             var size = new System.Drawing.Size(destination.X - location.X, destination.Y - location.Y);
-            this.area = new Rectangle(location, size);
-            e.Graphics.DrawRectangle(Pens.Purple, this.area);
+            this._area = new Rectangle(location, size);
+            e.Graphics.DrawRectangle(Pens.Purple, this._area);
         }
 
         private void CancelSelection()
         {
-            this.area = default(Rectangle);
+            this._area = default(Rectangle);
             this.EndSelection();
         }
 
         private void EndSelection()
         {
-            this.areaSelectedEvent(this.area);
+            this.AreaSelectedEvent?.Invoke(this._area);
             HotkeyManager.RemoveGlobalKeyHook(this);
             this.Dispose();
         }
@@ -74,7 +74,7 @@ namespace vobla
         {
             if (e.Button == MouseButtons.Left)
             {
-                this.SelectionStart = this.SelectionEnd = Cursor.Position;
+                this._selectionStart = this._selectionEnd = Cursor.Position;
                 this.Refresh();
             }
         }

@@ -7,15 +7,15 @@ namespace vobla
 {
     public class AsyncRelayCommand : ICommand
     {
-        private readonly Func<object, Task> execute;
-        private readonly Func<object, bool> canExecute;
+        private readonly Func<object, Task> _execute;
+        private readonly Func<object, bool> _canExecute;
 
-        private long isExecuting;
+        private long _isExecuting;
 
         public AsyncRelayCommand(Func<object, Task> execute, Func<object, bool> canExecute = null)
         {
-            this.execute = execute;
-            this.canExecute = canExecute ?? (o => true);
+            this._execute = execute;
+            this._canExecute = canExecute ?? (o => true);
         }
 
         public event EventHandler CanExecuteChanged
@@ -31,24 +31,24 @@ namespace vobla
 
         public bool CanExecute(object parameter)
         {
-            if (Interlocked.Read(ref isExecuting) != 0)
+            if (Interlocked.Read(ref _isExecuting) != 0)
                 return false;
 
-            return canExecute(parameter);
+            return _canExecute(parameter);
         }
 
         public async void Execute(object parameter)
         {
-            Interlocked.Exchange(ref isExecuting, 1);
+            Interlocked.Exchange(ref _isExecuting, 1);
             RaiseCanExecuteChanged();
 
             try
             {
-                await execute(parameter);
+                await _execute(parameter);
             }
             finally
             {
-                Interlocked.Exchange(ref isExecuting, 0);
+                Interlocked.Exchange(ref _isExecuting, 0);
                 RaiseCanExecuteChanged();
             }
         }

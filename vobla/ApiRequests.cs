@@ -15,13 +15,7 @@ namespace vobla
     {
         private static readonly ApiRequests instance = new ApiRequests();
 
-        public static ApiRequests Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
+        public static ApiRequests Instance => instance;
 
         private class LoginData
         {
@@ -29,23 +23,23 @@ namespace vobla
             public string password { get; set; }
         }
 
-        private System.Net.Http.HttpClient httpclient = null;
+        private readonly System.Net.Http.HttpClient _httpClient = null;
 
         private ApiRequests()
         {
-            this.httpclient = new HttpClient();
-            this.httpclient.BaseAddress = new Uri(new Uri(vobla.Properties.Settings.Default.URL), "/api/");
+            this._httpClient = new HttpClient {};
+            this._httpClient.BaseAddress = new Uri(new Uri(vobla.Properties.Settings.Default.URL), "/api/");
         }
 
         public void SetToken(string token)
         {
-            this.httpclient.DefaultRequestHeaders.Remove("Auth-token");
-            this.httpclient.DefaultRequestHeaders.Add("Auth-token", token);
+            this._httpClient.DefaultRequestHeaders.Remove("Auth-token");
+            this._httpClient.DefaultRequestHeaders.Add("Auth-token", token);
         }
 
         public async Task<bool> SyncPost()
         {
-            var response = await this.httpclient.PostAsync("user/sync", null);
+            var response = await this._httpClient.PostAsync("user/sync", null);
             var result = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {
@@ -53,7 +47,7 @@ namespace vobla
             }
             else
             {
-                Console.WriteLine("{0} ({1})", (int)response.StatusCode, result);
+                Console.WriteLine($"{response.StatusCode} ({result})");
                 return false;
             }
         }
@@ -61,7 +55,7 @@ namespace vobla
         public async Task<Dictionary<String, String>> LoginPost(string email, string password)
         {
             LoginData data = new LoginData { email = email, password = password };
-            var response = await this.httpclient.PostAsJsonAsync("user/login", data);
+            var response = await this._httpClient.PostAsJsonAsync("user/login", data);
             var result = await response.Content.ReadAsStringAsync();
             var dict = new Dictionary<String, String>();
             if (response.IsSuccessStatusCode)
@@ -74,7 +68,7 @@ namespace vobla
             }
             else
             {
-                Console.WriteLine("{0} ({1})", (int)response.StatusCode, result);
+                Console.WriteLine($"{response.StatusCode} ({result})");
             }
             return dict;
         }
@@ -91,7 +85,7 @@ namespace vobla
             var formData = new MultipartFormDataContent();
             HttpContent bytesContent = new ByteArrayContent(this.ImageToByteArray(img));
             formData.Add(bytesContent, "file", imageName);
-            var response = await this.httpclient.PostAsync("files", formData);
+            var response = await this._httpClient.PostAsync("files", formData);
             var result = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {
@@ -102,7 +96,7 @@ namespace vobla
             }
             else
             {
-                Console.WriteLine("{0} ({1})", (int)response.StatusCode, result);
+                Console.WriteLine($"{response.StatusCode} ({result})");
                 return null;
             }
         }

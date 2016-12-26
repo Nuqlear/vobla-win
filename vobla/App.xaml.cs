@@ -12,9 +12,9 @@ namespace vobla
 {
     public partial class App : Application, IDisposable
     {
-        private System.Windows.Forms.NotifyIcon notifyIcon = null;
-        private SettingsWindow settingsWindow = null;
-        private AreaSelector asForm = null;
+        private System.Windows.Forms.NotifyIcon _notifyIcon = null;
+        private SettingsWindow _settingsWindow = null;
+        private AreaSelector _asForm = null;
 
         #region Init
         private void DoStartup()
@@ -24,7 +24,6 @@ namespace vobla
             if (UserModel.IsLoggedIn())
             {
                 ApiRequests.Instance.SetToken(UserModel.Token);
-                // running task synchronously
                 var res = Task.Run(async () => await ApiRequests.Instance.SyncPost()).Result;
                 if (!res)
                 {
@@ -57,20 +56,20 @@ namespace vobla
 
         private void InitSettingsWindow()
         {
-            if (this.settingsWindow == null)
+            if (this._settingsWindow == null)
             {
-                this.settingsWindow = new SettingsWindow();
-                this.settingsWindow.Hided += this.SettingsWindow_Hided;
+                this._settingsWindow = new SettingsWindow();
+                this._settingsWindow.Hided += this.SettingsWindow_Hided;
             }
             if (!UserModel.IsLoggedIn())
             {
-                this.settingsWindow.Show();
+                this._settingsWindow.Show();
             }
         }
 
         public void ShowSettingsWindow()
         {
-            this.settingsWindow.Show();
+            this._settingsWindow.Show();
             this.updateContextMenu();
         }
 
@@ -78,20 +77,20 @@ namespace vobla
         private void AddNotifyIcon()
         {
             // setup icon
-            this.notifyIcon = new System.Windows.Forms.NotifyIcon();
-            this.notifyIcon.Text = vobla.Properties.Resources.NotifyText;
-            this.notifyIcon.Icon = vobla.Properties.Resources.favicon;
+            this._notifyIcon = new System.Windows.Forms.NotifyIcon();
+            this._notifyIcon.Text = vobla.Properties.Resources.NotifyText;
+            this._notifyIcon.Icon = vobla.Properties.Resources.favicon;
             
-            this.notifyIcon.MouseDoubleClick += (object sender, System.Windows.Forms.MouseEventArgs e) => {
+            this._notifyIcon.MouseDoubleClick += (object sender, System.Windows.Forms.MouseEventArgs e) => {
                 ShowSettingsWindow();
             };
             // show icon
-            this.notifyIcon.Visible = true;
+            this._notifyIcon.Visible = true;
         }
 
         private void updateContextMenu()
         {
-            this.notifyIcon.ContextMenu = this.CreateNotifyIconContextMenu();
+            this._notifyIcon.ContextMenu = this.CreateNotifyIconContextMenu();
         }
 
         private System.Windows.Forms.ContextMenu CreateNotifyIconContextMenu()
@@ -112,7 +111,7 @@ namespace vobla
                 Text = $"{appName} {version.Major}.{version.Minor}.{version.Build}"
             };
             contextMenu.MenuItems.Add(voblaInfo);
-            if (!this.settingsWindow.IsVisible)
+            if (!this._settingsWindow.IsVisible)
             {
                 System.Windows.Forms.MenuItem itemSettings = new System.Windows.Forms.MenuItem()
                 {
@@ -133,7 +132,7 @@ namespace vobla
         #region Hotkeys
         private void AddKeyHook()
         {
-            HotkeyManager.hotKeyPressedEvent += HotKeyHelper_HotKeyPressed;
+            HotkeyManager.HotKeyPressedEvent += HotKeyHelper_HotKeyPressed;
             this.AddKeyHook(
                 vobla.Properties.Settings.Default.CaptureAreaVKCode,
                 vobla.Properties.Settings.Default.CaptureAreaVKModifier
@@ -147,12 +146,12 @@ namespace vobla
 
         private void AddKeyHook(uint vkCode, uint modKeys)
         {
-            HotkeyManager.AddGlobalKeyHook(this.settingsWindow, modKeys, vkCode);
+            HotkeyManager.AddGlobalKeyHook(this._settingsWindow, modKeys, vkCode);
         }
 
         private void RemoveKeyHook()
         {
-            HotkeyManager.RemoveGlobalKeyHook(this.settingsWindow);
+            HotkeyManager.RemoveGlobalKeyHook(this._settingsWindow);
         }
 
         private void HotKeyHelper_HotKeyPressed(object sender, EventArgs e)
@@ -182,17 +181,17 @@ namespace vobla
 
         private void ScreenshotArea()
         {
-            if (this.asForm == null && UserModel.IsLoggedIn())
+            if (this._asForm == null && UserModel.IsLoggedIn())
             {
-                this.asForm = new AreaSelector();
-                this.asForm.Show();
-                this.asForm.areaSelectedEvent += AreaSelectedHandler;
+                this._asForm = new AreaSelector();
+                this._asForm.Show();
+                this._asForm.AreaSelectedEvent += AreaSelectedHandler;
             }
         }
 
         private async void AreaSelectedHandler(Rectangle rect)
         {
-            this.asForm = null;
+            this._asForm = null;
             if (!rect.IsEmpty)
             {
                 Image img = CaptureScreen.CaptureRectangle(rect);
@@ -209,7 +208,7 @@ namespace vobla
                 String host = vobla.Properties.Settings.Default.URL;
                 String url = new Uri(new Uri(host), fileSlug).ToString();
                 Clipboard.SetDataObject(url);
-                this.notifyIcon.ShowBalloonTip(
+                this._notifyIcon.ShowBalloonTip(
                     vobla.Properties.Settings.Default.BalloontipTimeout,
                     vobla.Properties.Resources.BalloontipUploadedTitle,
                     vobla.Properties.Resources.BalloontipUploadedText,
@@ -218,7 +217,7 @@ namespace vobla
             }
             else
             {
-                this.notifyIcon.ShowBalloonTip(
+                this._notifyIcon.ShowBalloonTip(
                     vobla.Properties.Settings.Default.BalloontipTimeout,
                     vobla.Properties.Resources.BalloontipUploadErrorTitle,
                     vobla.Properties.Resources.BalloontipUploadErrorText,
@@ -242,7 +241,7 @@ namespace vobla
 
         private void App_Exit(object sender, ExitEventArgs e)
         {
-            this.notifyIcon.Dispose();
+            this._notifyIcon.Dispose();
         }
 
         private void App_Startup(object sender, StartupEventArgs e)
@@ -260,7 +259,7 @@ namespace vobla
         {
             if (disposing)
             {
-                this.notifyIcon.Dispose();
+                this._notifyIcon.Dispose();
             }
         }
         ~App()

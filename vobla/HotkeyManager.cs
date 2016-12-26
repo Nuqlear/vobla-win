@@ -11,7 +11,7 @@ namespace vobla
     public class HotkeyManager
     {
         public delegate void HotKeyPressedEventHandler(object sender, EventArgs e);
-        public static event HotKeyPressedEventHandler hotKeyPressedEvent;
+        public static event HotKeyPressedEventHandler HotKeyPressedEvent;
 
         [DllImport("user32.dll")]
         public static extern bool RegisterHotKey(
@@ -24,7 +24,7 @@ namespace vobla
         {
             WindowInteropHelper helper = new WindowInteropHelper(window);
             var hwndSource = HwndSource.FromHwnd(helper.Handle);
-            hwndSource.AddHook(HwndHook);
+            hwndSource?.AddHook(HwndHook);
             RegisterHotKey(helper.Handle, WinApiConstants.HOTKEY_ID, modifierKeyID, vk);
         }
 
@@ -42,7 +42,7 @@ namespace vobla
         {
             WindowInteropHelper helper = new WindowInteropHelper(window);
             HwndSource hwndSource = HwndSource.FromHwnd(helper.Handle);
-            hwndSource.RemoveHook(HwndHook);
+            hwndSource?.RemoveHook(HwndHook);
             UnregisterHotKey(helper.Handle, WinApiConstants.HOTKEY_ID);
         }
 
@@ -77,7 +77,7 @@ namespace vobla
                                     key = key | (Keys)(Enum.Parse(typeof(Keys), Enum.GetName(typeof(Modifiers), modifierKey)));
                                 }
                             }
-                            hotKeyPressedEvent(null, new KeyEventArgs(key));
+                            HotKeyPressedEvent?.Invoke(null, new KeyEventArgs(key));
                             handled = true;
                             break;
                     }
