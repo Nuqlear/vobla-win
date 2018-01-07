@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
 using System.Drawing;
 using System.IO;
+using System.Net.Http.Formatting;
 
 namespace vobla
 {
@@ -27,19 +28,19 @@ namespace vobla
 
         private ApiRequests()
         {
-            this._httpClient = new HttpClient {};
+            this._httpClient = new HttpClient { };
             this._httpClient.BaseAddress = new Uri(new Uri(vobla.Properties.Settings.Default.URL), "/api/");
         }
 
         public void SetToken(string token)
         {
-            this._httpClient.DefaultRequestHeaders.Remove("Auth-token");
-            this._httpClient.DefaultRequestHeaders.Add("Auth-token", token);
+            this._httpClient.DefaultRequestHeaders.Remove("Authorization");
+            this._httpClient.DefaultRequestHeaders.Add("Authorization", $"bearer {token}");
         }
 
         public async Task<bool> SyncPost()
         {
-            var response = await this._httpClient.PostAsync("user/sync", null);
+            var response = await this._httpClient.PostAsync("users/jwtcheck", null);
             var result = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {
@@ -55,13 +56,13 @@ namespace vobla
         public async Task<Dictionary<String, String>> LoginPost(string email, string password)
         {
             LoginData data = new LoginData { email = email, password = password };
-            var response = await this._httpClient.PostAsJsonAsync("user/login", data);
+            var response = await this._httpClient.PostAsJsonAsync("users/login", data);
             var result = await response.Content.ReadAsStringAsync();
             var dict = new Dictionary<String, String>();
             if (response.IsSuccessStatusCode)
             {
                 JObject jData = JObject.Parse(result);
-                foreach(var node in jData)
+                foreach (var node in jData)
                 {
                     dict[node.Key] = (string)node.Value;
                 }
@@ -80,19 +81,70 @@ namespace vobla
             return ms.ToArray();
         }
 
-        public async Task<String> ImagePost(Image img, string imageName = "screenshotname.png")
+        public async Task<HttpResponseMessage> UploadChunk(byte[] imageBytes,
+                                                           string chunkNumber,
+                                                           string chunkSize,
+                                                           string fileTotalSize,
+                                                           string dropHash=null,
+                                                           string dropFileHash=null)
         {
             var formData = new MultipartFormDataContent();
-            HttpContent bytesContent = new ByteArrayContent(this.ImageToByteArray(img));
-            formData.Add(bytesContent, "file", imageName);
-            var response = await this._httpClient.PostAsync("files", formData);
+            ByteArrayContent bytesContent = new ByteArrayContent(imageBytes);
+            if (dropHash != null)
+            {
+                formData.Headers.Add("Drop-Hash", dropHash);
+            }
+            if (dropFileHash != null)
+            {
+                formData.Headers.Add("Drop-File-Hash", dropFileHash);
+            }
+            formData.Headers.Add("Chunk-Number", chunkNumber);
+            formData.Headers.Add("Chunk-Size", chunkSize);
+            formData.Headers.Add("File-Total-Size", fileTotalSize);
+            formData.Add(bytesContent, "chunk", "file");
+            Console.WriteLine(formData.Headers.ToString());
+            return await this._httpClient.PostAsync("drops/upload", formData);
+        }
+
+        public async Task<String> ImagePost(Image img, string imageName = "screenshotname.png")
+        {
+            var CHUNK_SIZE = 100000;
+            var chunkNumber = 1;
+            var imageBytes = this.ImageToByteArray(img);
+            Func<int> calculateLen = () => Math.Min(imageBytes.Length - ((chunkNumber - 1) * CHUNK_SIZE), CHUNK_SIZE);
+            var length = calculateLen();
+            byte[] buffer = new byte[length];
+            Buffer.BlockCopy(imageBytes, Math.Min((chunkNumber - 1) * CHUNK_SIZE, imageBytes.Length), buffer, 0, length);
+            var response = await this.UploadChunk(buffer,
+                                              chunkNumber.ToString(),
+                                              CHUNK_SIZE.ToString(),
+                                              imageBytes.Length.ToString(),
+                                              null,
+                                              null);
             var result = await response.Content.ReadAsStringAsync();
+
             if (response.IsSuccessStatusCode)
             {
                 JObject jData = JObject.Parse(result);
-                string url = (string)(jData["file"]["hash"]) + "*";
-                Console.WriteLine(url);
-                return url;
+                var dropFileHash = (string)jData["drop_file_hash"];
+                Console.WriteLine(dropFileHash);
+                chunkNumber++;
+                length = calculateLen();
+                while (length > 0)
+                {
+                    buffer = null;
+                    buffer = new byte[length];
+                    Buffer.BlockCopy(imageBytes, (chunkNumber - 1) * CHUNK_SIZE, buffer, 0, length);
+                    response = await this.UploadChunk(buffer,
+                                              chunkNumber.ToString(),
+                                              CHUNK_SIZE.ToString(),
+                                              imageBytes.Length.ToString(),
+                                              null,
+                                              dropFileHash);
+                    chunkNumber++;
+                    length = calculateLen();
+                }
+                return dropFileHash;
             }
             else
             {

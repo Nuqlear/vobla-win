@@ -37,7 +37,7 @@ namespace vobla.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://vobla.olegshigor.in/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://vobla.olegshigor.in/")]
         public string URL {
             get {
                 return ((string)(this["URL"]));
