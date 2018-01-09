@@ -1,25 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Windows.Forms;
+using Gma.System.MouseKeyHook;
+
 
 namespace vobla
 {
     public delegate void AreaSelected(Rectangle rect);
 
-    class AreaSelector: Form
+    class AreaSelector : Form
     {
         private System.Drawing.Point _selectionStart;
         private System.Drawing.Point _selectionEnd;
         private Rectangle _area;
+        private readonly IKeyboardMouseEvents _globalHook;
+        private Dictionary<int, IntPtr> _cursorsBackup;
+
         public event AreaSelected AreaSelectedEvent;
 
         public AreaSelector()
         {
+            this._cursorsBackup = new Dictionary<int, IntPtr>();
+            foreach (var cursorId in WinApiConstants.Cursors())
+            {
+                _cursorsBackup[cursorId] = CopyIcon(LoadCursor(IntPtr.Zero, cursorId));
+                SetSystemCursor(CopyIcon(LoadCursor(IntPtr.Zero, WinApiConstants.IDC_CROSS)), cursorId);
+            }
+
             this._area = default(Rectangle);
-
             this.DoubleBuffered = true;
-
             /* making transparent window */
             this.Bounds = Screen.PrimaryScreen.Bounds;
             this.TopMost = true;
@@ -27,16 +38,17 @@ namespace vobla
             this.FormBorderStyle = FormBorderStyle.None;
             this.BackColor = Color.Cyan;
             this.TransparencyKey = Color.Cyan;
-
-            Paint += new PaintEventHandler(this.PaintSelection);
-            MouseDown += new MouseEventHandler(this.MouseDownEvent);
-            MouseMove += new MouseEventHandler(this.MouseMoveEvent);
-            MouseUp += new MouseEventHandler(this.MouseUpEvent);
+            this._globalHook = Hook.GlobalEvents();
+            this._globalHook.MouseDownExt += this.MouseDownEvent;
+            this._globalHook.MouseUpExt += this.MouseUpEvent;
+            this._globalHook.MouseMoveExt += this.MouseMoveEvent;
+            this._globalHook.MouseMoveExt -= null;
+            Paint += new PaintEventHandler(this.PaintEvent);
 
             HotkeyManager.AddGlobalKeyHook(this, 0x0000, WinApiConstants.VK_ESCAPE);
         }
 
-        void PaintSelection(object sender, PaintEventArgs e)
+        void PaintEvent(object sender, PaintEventArgs e)
         {
             if (this._selectionStart.IsEmpty)
             {
@@ -57,6 +69,12 @@ namespace vobla
             e.Graphics.DrawRectangle(Pens.Purple, this._area);
         }
 
+        private void StartSelection()
+        {
+            this._selectionStart = this._selectionEnd = Cursor.Position;
+            this.Refresh();
+        }
+
         private void CancelSelection()
         {
             this._area = default(Rectangle);
@@ -65,28 +83,37 @@ namespace vobla
 
         private void EndSelection()
         {
+            foreach (KeyValuePair<int, IntPtr> cursor in this._cursorsBackup)
+            {
+                SetSystemCursor(cursor.Value, cursor.Key);
+            }
             this.AreaSelectedEvent?.Invoke(this._area);
             HotkeyManager.RemoveGlobalKeyHook(this);
             this.Dispose();
         }
 
-        private void MouseDownEvent(object sender, MouseEventArgs e)
+        private void MouseDownEvent(object sender, MouseEventExtArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                this._selectionStart = this._selectionEnd = Cursor.Position;
-                this.Refresh();
+                this.StartSelection();
             }
+            e.Handled = true;
         }
 
-        private void MouseMoveEvent(object sender, MouseEventArgs e)
+        [DllImport("user32.dll")]
+        private static extern IntPtr CopyIcon(IntPtr hIcon);
+        //                SetSystemCursor(CopyIcon(Cursors.Cross.Handle), 32512);
+
+        private void MouseMoveEvent(object sender, MouseEventExtArgs e)
         {
             this.Refresh();
         }
 
-        private void MouseUpEvent(object sender, MouseEventArgs e)
+        private void MouseUpEvent(object sender, MouseEventExtArgs e)
         {
             this.EndSelection();
+            e.Handled = true;
         }
 
         /* 
@@ -107,23 +134,39 @@ namespace vobla
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr LoadCursor(IntPtr hInstance, int lpCursorName);
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr SetCursor(IntPtr hCursor);
-        
+        [DllImport("user32.dll")]
+        private static extern bool SetSystemCursor(IntPtr hCursor, int lpCursorName);
+
         protected override void WndProc(ref Message m)
         {
             var handled = false;
-            if (m.Msg == WinApiConstants.WM_SETCURSOR)
-            {
-                SetCursor(LoadCursor(IntPtr.Zero, WinApiConstants.IDC_CROSS));
-                handled = true;
-            }
-            else if (m.Msg == WinApiConstants.WM_HOTKEY)
+            //            if (m.Msg == WinApiConstants.WM_SETCURSOR)
+            //            {
+            //                SetCursor(LoadCursor(IntPtr.Zero, WinApiConstants.IDC_CROSS));
+            //                handled = true;
+            //            }
+            if (m.Msg == WinApiConstants.WM_HOTKEY)
             {
                 this.CancelSelection();
             }
             if (handled) DefWndProc(ref m); else base.WndProc(ref m);
         }
-    
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            // 
+            // AreaSelector
+            // 
+            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Name = "AreaSelector";
+            this.ResumeLayout(false);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            this._globalHook.Dispose();
+            base.Dispose(disposing);
+        }
     }
 }
