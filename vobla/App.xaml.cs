@@ -206,7 +206,7 @@ namespace vobla
             if (fileSlug != null)
             {
                 String host = vobla.Properties.Settings.Default.URL;
-                String url = new Uri(new Uri(host), fileSlug).ToString();
+                String url = new Uri(new Uri(host), $"f/{fileSlug}").ToString();
                 Clipboard.SetDataObject(url);
                 this._notifyIcon.ShowBalloonTip(
                     vobla.Properties.Settings.Default.BalloontipTimeout,

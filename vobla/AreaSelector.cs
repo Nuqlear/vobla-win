@@ -16,7 +16,7 @@ namespace vobla
         private System.Drawing.Point _selectionEnd;
         private Rectangle _area;
         private readonly IKeyboardMouseEvents _globalHook;
-        private Dictionary<int, IntPtr> _cursorsBackup;
+        private readonly Dictionary<int, IntPtr> _cursorsBackup;
 
         public event AreaSelected AreaSelectedEvent;
 
@@ -98,7 +98,7 @@ namespace vobla
             {
                 this.StartSelection();
             }
-            e.Handled = true;
+//            e.Handled = true;
         }
 
         [DllImport("user32.dll")]
