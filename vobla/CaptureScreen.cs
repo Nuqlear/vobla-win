@@ -39,7 +39,7 @@ namespace vobla
             IntPtr hdcDest = CreateCompatibleDC(hdcSrc);
             IntPtr hBitmap = CreateCompatibleBitmap(hdcSrc, rectangle.Width, rectangle.Height);
             IntPtr hOld = SelectObject(hdcDest, hBitmap);
-            BitBlt(hdcDest, 0, 0, rectangle.Width, rectangle.Height, hdcSrc, rectangle.X, rectangle.Y, CopyPixelOperation.SourceCopy | CopyPixelOperation.CaptureBlt);
+            BitBlt(hdcDest, 0, 0, rectangle.Width - 1, rectangle.Height - 1, hdcSrc, rectangle.X + 1, rectangle.Y + 1, CopyPixelOperation.SourceCopy | CopyPixelOperation.CaptureBlt);
             SelectObject(hdcDest, hOld);
             DeleteDC(hdcDest);
             ReleaseDC(handle, hdcSrc);

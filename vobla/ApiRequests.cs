@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
 using System.Drawing;
 using System.IO;
-using System.Net.Http.Formatting;
 
 namespace vobla
 {
@@ -38,9 +34,9 @@ namespace vobla
             this._httpClient.DefaultRequestHeaders.Add("Authorization", $"bearer {token}");
         }
 
-        public async Task<bool> SyncPost()
+        public async Task<bool> SyncGet()
         {
-            var response = await this._httpClient.PostAsync("users/jwtcheck", null);
+            var response = await this._httpClient.GetAsync("users/jwtcheck");
             var result = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {

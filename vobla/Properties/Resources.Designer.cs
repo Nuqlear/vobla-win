@@ -161,6 +161,15 @@ namespace vobla.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Dashboard.
+        /// </summary>
+        public static string NotifyOpenDashboard {
+            get {
+                return ResourceManager.GetString("NotifyOpenDashboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Settings.
         /// </summary>
         public static string NotifySettings {

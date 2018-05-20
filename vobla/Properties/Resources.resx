@@ -160,4 +160,7 @@
   <data name="AccountLogoutButton" xml:space="preserve">
     <value>Logout</value>
   </data>
+  <data name="NotifyOpenDashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
 </root>

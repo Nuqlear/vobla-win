@@ -1,9 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Squirrel;
@@ -24,7 +21,7 @@ namespace vobla
             if (UserModel.IsLoggedIn())
             {
                 ApiRequests.Instance.SetToken(UserModel.Token);
-                var res = Task.Run(async () => await ApiRequests.Instance.SyncPost()).Result;
+                var res = Task.Run(async () => await ApiRequests.Instance.SyncGet()).Result;
                 if (!res)
                 {
                     UserModel.Clear();
@@ -111,6 +108,12 @@ namespace vobla
                 Text = $"{appName} {version.Major}.{version.Minor}.{version.Build}"
             };
             contextMenu.MenuItems.Add(voblaInfo);
+            System.Windows.Forms.MenuItem openSite = new System.Windows.Forms.MenuItem()
+            {
+                Text = vobla.Properties.Resources.NotifyOpenDashboard
+            };
+            openSite.Click += TrayOpenSite_Click;
+            contextMenu.MenuItems.Add(openSite);
             if (!this._settingsWindow.IsVisible)
             {
                 System.Windows.Forms.MenuItem itemSettings = new System.Windows.Forms.MenuItem()
@@ -232,6 +235,11 @@ namespace vobla
         {
             this.RemoveKeyHook();
             this.Shutdown();
+        }
+
+        private void TrayOpenSite_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start($"{vobla.Properties.Settings.Default.URL}");
         }
 
         private void SettingsWindow_Hided(object sender, EventArgs e)

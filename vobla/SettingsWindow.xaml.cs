@@ -1,18 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.ComponentModel;
 using System.Windows.Interop;
 
@@ -67,8 +58,7 @@ namespace vobla
         private void OnPropertyChanged(string propertyName)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler == null) return;
-            handler(this, new PropertyChangedEventArgs(propertyName));
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public SettingsWindow()
@@ -143,6 +133,18 @@ namespace vobla
             e.Cancel = true;
             Hide();
             this.Hided(null, null);
+        }
+
+        private async void Grid_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                var grid = (Grid)sender;
+                var passwordBox = (PasswordBox)(grid.Children.Cast<UIElement>().First(
+                    child => Grid.GetRow(child) == 1 && Grid.GetColumn(child) == 1
+                ));
+                await this.Login(passwordBox);
+            }
         }
     }
 }

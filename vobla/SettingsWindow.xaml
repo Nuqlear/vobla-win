@@ -35,7 +35,7 @@
 
         <DataTemplate x:Key="LoginDataTemplate">
             <StackPanel Margin="0,5,0,-5">
-                <Grid>
+                <Grid KeyDown="Grid_KeyDown">
 
                     <!-- Устанавливаем две строки -->
                     <Grid.RowDefinitions>
@@ -53,7 +53,7 @@
                     <TextBox Height="30" Padding="5" Grid.Row="0" Grid.Column="1" Margin="2,2,10,2"
                         Text = "{Binding email, Mode = TwoWay, UpdateSourceTrigger = PropertyChanged, 
                         RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"/>
-                    <PasswordBox Name="passwordBox" Height="30" Padding="5" Grid.Row="1" Grid.Column="1" Margin="2,2,10,2"/>
+                    <PasswordBox x:Name="passwordBox" Height="30" Padding="5" Grid.Row="1" Grid.Column="1" Margin="2,2,10,2"/>
                 </Grid>
                 <Button Content="{x:Static p:Resources.AccountLoginButton}" Height="26" 
                         VerticalAlignment="Top" RenderTransformOrigin="0.49,1.269" Margin="0,5,130,5" 
