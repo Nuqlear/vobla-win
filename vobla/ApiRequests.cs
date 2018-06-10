@@ -99,7 +99,7 @@ namespace vobla
             formData.Headers.Add("File-Total-Size", fileTotalSize);
             formData.Add(bytesContent, "chunk", "file");
             Console.WriteLine(formData.Headers.ToString());
-            return await this._httpClient.PostAsync("drops/upload", formData);
+            return await this._httpClient.PostAsync("drops/upload/chunks", formData);
         }
 
         public async Task<String> ImagePost(Image img, string imageName = "screenshotname.png")
