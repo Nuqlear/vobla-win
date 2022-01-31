@@ -76,7 +76,7 @@ namespace vobla
             // setup icon
             this._notifyIcon = new System.Windows.Forms.NotifyIcon();
             this._notifyIcon.Text = vobla.Properties.Resources.NotifyText;
-            this._notifyIcon.Icon = vobla.Properties.Resources.favicon;
+            this._notifyIcon.Icon = vobla.Properties.Resources.Icon32;
             
             this._notifyIcon.MouseDoubleClick += (object sender, System.Windows.Forms.MouseEventArgs e) => {
                 ShowSettingsWindow();

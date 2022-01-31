@@ -154,13 +154,16 @@ namespace vobla
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AreaSelector));
             this.SuspendLayout();
             // 
             // AreaSelector
             // 
             this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "AreaSelector";
             this.ResumeLayout(false);
+
         }
 
         protected override void Dispose(bool disposing)

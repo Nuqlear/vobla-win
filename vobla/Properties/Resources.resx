@@ -120,10 +120,6 @@
   <data name="AccountLoginButton" xml:space="preserve">
     <value>Login</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="favicon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\favicon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="NotifyExit" xml:space="preserve">
     <value>Exit</value>
   </data>
@@ -162,5 +158,12 @@
   </data>
   <data name="NotifyOpenDashboard" xml:space="preserve">
     <value>Dashboard</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Icon32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icon32.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Icon64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icon64.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
