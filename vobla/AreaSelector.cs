@@ -32,7 +32,7 @@ namespace vobla
             this._area = default(Rectangle);
             this.DoubleBuffered = true;
             /* making transparent window */
-            this.Bounds = Screen.PrimaryScreen.Bounds;
+            this.SetBounds(0, 0, 9000, 9000);
             this.TopMost = true;
             this.ShowInTaskbar = false;
             this.FormBorderStyle = FormBorderStyle.None;
